@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Response } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Response } from "@nestjs/common";
 import { validate } from "uuid";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { UserDto } from "./dto/user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { UserEntity } from "./user.entity";
 import { UserService } from "./user.service";
 
 @Controller('user')
@@ -18,9 +19,9 @@ export class UserController {
     @Get(':uuid')
     async findOne(
         @Param('uuid') uuid: string
-    ): Promise<UserDto> {
+    ): Promise<UserEntity> {
         if(!validate(uuid)) {
-            throw new HttpException('NO_CONTENT', HttpStatus.BAD_REQUEST);
+            throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
         }
         return this.userService.findOne(uuid);
     }
@@ -28,7 +29,7 @@ export class UserController {
     @Post()
     async createUser(
         @Body() createUserDto: CreateUserDto
-    ): Promise<Omit<UserDto, 'password'>> {
+    ): Promise<Omit<UserEntity, 'password'>> {
         return this.userService.createUser(createUserDto);
     }
 
@@ -37,7 +38,21 @@ export class UserController {
     async delete(
         @Param('uuid') uuid: string
     ): Promise<void> {
-        this.userService.delete(uuid);
+        if(!validate(uuid)) {
+            throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
+        }
+        return this.userService.delete(uuid);
     }
 
+    @Put(':uuid')
+    async update(
+        @Param('uuid') uuid: string,
+        @Body() updateUserDto: UpdateUserDto
+    ): Promise<Omit<UserEntity, 'password'>> {
+        if(!validate(uuid)) {
+            throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
+        }
+
+        return this.userService.update(uuid, updateUserDto);
+    }
 }

@@ -1,17 +1,18 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { v4 } from 'uuid';
 import { CreateUserDto } from "./dto/create-user.dto";
-import { UserDto } from "./dto/user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { UserEntity } from "./user.entity";
 
 @Injectable()
 export class UserRepository {
-    static users: UserDto[] = [];
+    static users: UserEntity[] = [];
 
-    public findAll(): UserDto[] {
+    public findAll(): UserEntity[] {
         return UserRepository.users;
     }
 
-    public findOne(uuid: string): UserDto {
+    public findOne(uuid: string): UserEntity {
         const pos = UserRepository.users.findIndex(user => user.id === uuid);
 
         if(pos < 0) {
@@ -22,8 +23,8 @@ export class UserRepository {
         return user;
     }
 
-    public createUser(user: CreateUserDto): Omit<UserDto, 'password'> {
-        const now = Date.now()
+    public createUser(user: CreateUserDto): Omit<UserEntity, 'password'> {
+        const now = Date.now();
         const newUser = {
             ...user,
             id: v4(),
@@ -42,7 +43,7 @@ export class UserRepository {
         };
     }
 
-    public delete(uuid: string): UserDto {
+    public delete(uuid: string): UserEntity {
         const pos = UserRepository.users.findIndex(user => user.id === uuid);
 
         if (pos < 0) {
@@ -53,5 +54,31 @@ export class UserRepository {
         UserRepository.users.splice(pos, 1);
 
         return user;
+    }
+
+    public update(uuid: string, updateUserDto: UpdateUserDto): Omit<UserEntity, 'password'> {
+        const pos = UserRepository.users.findIndex(user => user.id === uuid);
+        const prevUser = UserRepository.users[pos];
+
+        if (prevUser.password !== updateUserDto.oldPassword) {
+            throw new HttpException('NO_CONTENT', HttpStatus.FORBIDDEN);
+        }
+
+        const newUser = {
+            ...prevUser,
+            version: prevUser.version + 1,
+            updatedAt: Date.now(),
+            password: updateUserDto.newPassword,
+        };
+
+        UserRepository.users[pos] = newUser;
+
+        return {
+            id: prevUser.id,
+            version: newUser.version,
+            createdAt: prevUser.createdAt,
+            updatedAt: newUser.updatedAt,
+            login: prevUser.login
+        };
     }
 }
