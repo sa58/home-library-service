@@ -10,10 +10,10 @@ export class TrackDto {
     duration: number;
 
     @IsOptional()
-    @IsNumber()
+    @IsString()
     artistId: string | null;
 
     @IsOptional()
-    @IsNumber()
+    @IsString()
     albumId: string | null;
 }
