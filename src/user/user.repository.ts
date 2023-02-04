@@ -46,10 +46,6 @@ export class UserRepository {
     public delete(uuid: string): UserEntity {
         const pos = UserRepository.users.findIndex(user => user.id === uuid);
 
-        if (pos < 0) {
-            return null;
-        }
-
         const [user] =  UserRepository.users.slice(pos, pos + 1);
         UserRepository.users.splice(pos, 1);
 
