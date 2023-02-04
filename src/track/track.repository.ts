@@ -58,4 +58,8 @@ export class TrackRepository {
     public findTracksByArtistId(artistId: string): TrackEntity[] {
         return TrackRepository.tracks.filter(el => el.artistId === artistId);
     }
+
+    public findTracksByAlbumId(albumId: string): TrackEntity[] {
+        return TrackRepository.tracks.filter(el => el.albumId === albumId);
+    }
 }
