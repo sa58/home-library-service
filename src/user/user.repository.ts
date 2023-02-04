@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { v4 } from 'uuid';
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { UserAndPosition } from "./types/user-and-position.type";
 import { UserEntity } from "./user.entity";
 
 @Injectable()
@@ -12,7 +13,7 @@ export class UserRepository {
         return UserRepository.users;
     }
 
-    public findOne(uuid: string): UserEntity {
+    public findOne(uuid: string): UserAndPosition {
         const pos = UserRepository.users.findIndex(user => user.id === uuid);
 
         if(pos < 0) {
@@ -20,7 +21,7 @@ export class UserRepository {
         }
 
         const [user] =  UserRepository.users.slice(pos, pos + 1);
-        return user;
+        return {user, pos};
     }
 
     public createUser(user: CreateUserDto): Omit<UserEntity, 'password'> {
@@ -43,18 +44,14 @@ export class UserRepository {
         };
     }
 
-    public delete(uuid: string): UserEntity {
-        const pos = UserRepository.users.findIndex(user => user.id === uuid);
+    public delete(userAndPosition: UserAndPosition): void {
+        const pos = userAndPosition.pos;
 
-        const [user] =  UserRepository.users.slice(pos, pos + 1);
         UserRepository.users.splice(pos, 1);
-
-        return user;
     }
 
-    public update(uuid: string, updateUserDto: UpdateUserDto): Omit<UserEntity, 'password'> {
-        const pos = UserRepository.users.findIndex(user => user.id === uuid);
-        const prevUser = UserRepository.users[pos];
+    public update(updateUserDto: UpdateUserDto, userAndPosition: UserAndPosition): Omit<UserEntity, 'password'> {
+        const prevUser = userAndPosition.user;
 
         if (prevUser.password !== updateUserDto.oldPassword) {
             throw new HttpException('NO_CONTENT', HttpStatus.FORBIDDEN);
@@ -67,7 +64,7 @@ export class UserRepository {
             password: updateUserDto.newPassword,
         };
 
-        UserRepository.users[pos] = newUser;
+        UserRepository.users[userAndPosition.pos] = newUser;
 
         return {
             id: prevUser.id,

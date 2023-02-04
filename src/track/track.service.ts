@@ -28,9 +28,9 @@ export class TrackService {
     }
 
     async delete(uuid: string): Promise<void> {
-        await this.findOne(uuid);
+        const trackAndPosition = await this.findOne(uuid);
 
-        this.trackRepository.delete(uuid);
+        this.trackRepository.delete(trackAndPosition);
     }
 
     async update(uuid: string, trackDto: TrackDto): Promise<TrackEntity> {

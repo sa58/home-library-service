@@ -38,8 +38,8 @@ export class TrackRepository {
         return newTrack;
     }
 
-    public delete(uuid: string): void {
-        const pos = TrackRepository.tracks.findIndex(user => user.id === uuid);
+    public delete(trackAndPosition: TrackAndPosition): void {
+        const pos = trackAndPosition.pos;
 
         TrackRepository.tracks.splice(pos, 1);
     }

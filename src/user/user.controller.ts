@@ -23,7 +23,8 @@ export class UserController {
         if(!validate(uuid)) {
             throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
         }
-        return this.userService.findOne(uuid);
+
+        return (await this.userService.findOne(uuid)).user;
     }
 
     @Post()
