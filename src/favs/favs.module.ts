@@ -7,10 +7,14 @@ import { FavsRepository } from './favs.repository';
 import { FavsService } from './favs.service';
 
 @Module({
-    controllers: [FavsController],
-    providers: [FavsService, FavsRepository, TrackRepository, ArtistRepository, AlbumRepository],
-    exports: [FavsRepository]
+  controllers: [FavsController],
+  providers: [
+    FavsService,
+    FavsRepository,
+    TrackRepository,
+    ArtistRepository,
+    AlbumRepository,
+  ],
+  exports: [FavsRepository],
 })
-export class FavsModule {
-
-}
+export class FavsModule {}

@@ -1,5 +1,6 @@
-import { UserEntity } from "../user.entity";
+import { UserEntity } from '../user.entity';
 
 export interface UserAndPosition {
-    user: UserEntity; pos: number;
+  user: UserEntity;
+  pos: number;
 }

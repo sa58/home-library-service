@@ -1,65 +1,69 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
-import { TrackDto } from "./dto/track.dto";
-import { TrackEntity } from "./track.entity";
+import { TrackDto } from './dto/track.dto';
+import { TrackEntity } from './track.entity';
 
 export interface TrackAndPosition {
-    track: TrackEntity; pos: number;
+  track: TrackEntity;
+  pos: number;
 }
 
 @Injectable()
 export class TrackRepository {
-    static tracks: TrackEntity[] = [];
+  static tracks: TrackEntity[] = [];
 
-    public findAll(): TrackEntity[] {
-        return TrackRepository.tracks;
+  public findAll(): TrackEntity[] {
+    return TrackRepository.tracks;
+  }
+
+  public findOne(uuid: string): TrackAndPosition {
+    const pos = TrackRepository.tracks.findIndex((user) => user.id === uuid);
+
+    if (pos < 0) {
+      return null;
     }
 
-    public findOne(uuid: string): TrackAndPosition {
-        const pos = TrackRepository.tracks.findIndex(user => user.id === uuid);
+    const [track] = TrackRepository.tracks.slice(pos, pos + 1);
+    return { track, pos };
+  }
 
-        if(pos < 0) {
-            return null;
-        }
+  public create(track: TrackDto): TrackEntity {
+    const newTrack = {
+      ...track,
+      id: v4(),
+      artistId: track.artistId || null,
+      albumId: track.albumId || null,
+    };
 
-        const [track] =  TrackRepository.tracks.slice(pos, pos + 1);
-        return {track, pos};
-    }
+    TrackRepository.tracks.push(newTrack);
+    return newTrack;
+  }
 
-    public create(track: TrackDto): TrackEntity {
-        const newTrack = {
-            ...track,
-            id: v4(),
-            artistId: track.artistId || null,
-            albumId: track.albumId || null
-        };
+  public delete(trackAndPosition: TrackAndPosition): void {
+    const pos = trackAndPosition.pos;
 
-        TrackRepository.tracks.push(newTrack);
-        return newTrack;
-    }
+    TrackRepository.tracks.splice(pos, 1);
+  }
 
-    public delete(trackAndPosition: TrackAndPosition): void {
-        const pos = trackAndPosition.pos;
+  public update(
+    newTrack: TrackDto,
+    trackAndPosition: TrackAndPosition,
+  ): TrackEntity {
+    const track = {
+      ...trackAndPosition.track,
+      ...newTrack,
+    };
 
-        TrackRepository.tracks.splice(pos, 1);
-    }
+    TrackRepository.tracks[trackAndPosition.pos] = track;
 
-    public update(newTrack: TrackDto, trackAndPosition: TrackAndPosition): TrackEntity {
-        const track = {
-            ...trackAndPosition.track,
-            ...newTrack
-        };
+    return track;
+  }
 
-        TrackRepository.tracks[trackAndPosition.pos] = track;
+  public findTracksByArtistId(artistId: string): TrackEntity[] {
+    return TrackRepository.tracks.filter((el) => el.artistId === artistId);
+  }
 
-        return track;
-    }
-
-    public findTracksByArtistId(artistId: string): TrackEntity[] {
-        return TrackRepository.tracks.filter(el => el.artistId === artistId);
-    }
-
-    public findTracksByAlbumId(albumId: string): TrackEntity[] {
-        return TrackRepository.tracks.filter(el => el.albumId === albumId);
-    }
+  public findTracksByAlbumId(albumId: string): TrackEntity[] {
+    return TrackRepository.tracks.filter((el) => el.albumId === albumId);
+  }
 }

@@ -1,5 +1,6 @@
-import { AlbumEntity } from "../album.entity";
+import { AlbumEntity } from '../album.entity';
 
 export interface AlbumAndPosition {
-    album: AlbumEntity; pos: number;
+  album: AlbumEntity;
+  pos: number;
 }

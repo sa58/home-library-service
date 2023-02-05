@@ -5,10 +5,8 @@ import { TrackRepository } from './track.repository';
 import { TrackService } from './track.service';
 
 @Module({
-    controllers: [TrackController],
-    providers: [TrackService, TrackRepository, FavsRepository],
-    exports: [TrackRepository],
+  controllers: [TrackController],
+  providers: [TrackService, TrackRepository, FavsRepository],
+  exports: [TrackRepository],
 })
-export class TrackModule {
-
-}
+export class TrackModule {}

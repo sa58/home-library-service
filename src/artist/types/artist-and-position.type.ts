@@ -1,5 +1,6 @@
-import { ArtistEntity } from "../artist.entity";
+import { ArtistEntity } from '../artist.entity';
 
 export interface ArtistAndPosition {
-    user: ArtistEntity; pos: number;
+  user: ArtistEntity;
+  pos: number;
 }

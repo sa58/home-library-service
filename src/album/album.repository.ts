@@ -1,52 +1,55 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
-import { AlbumDto } from "./dto/album.dto";
-import { AlbumEntity } from "./album.entity";
-import { AlbumAndPosition } from "./types/album-and-position.type";
+import { AlbumDto } from './dto/album.dto';
+import { AlbumEntity } from './album.entity';
+import { AlbumAndPosition } from './types/album-and-position.type';
 
 @Injectable()
 export class AlbumRepository {
-    static artists: AlbumEntity[] = [];
+  static artists: AlbumEntity[] = [];
 
-    public findAll(): AlbumEntity[] {
-        return AlbumRepository.artists;
+  public findAll(): AlbumEntity[] {
+    return AlbumRepository.artists;
+  }
+
+  public findOne(uuid: string): AlbumAndPosition {
+    const pos = AlbumRepository.artists.findIndex((user) => user.id === uuid);
+
+    if (pos < 0) {
+      return null;
     }
 
-    public findOne(uuid: string): AlbumAndPosition {
-        const pos = AlbumRepository.artists.findIndex(user => user.id === uuid);
+    const [album] = AlbumRepository.artists.slice(pos, pos + 1);
+    return { album, pos };
+  }
 
-        if(pos < 0) {
-            return null;
-        }
+  public create(artist: AlbumDto): AlbumEntity {
+    const newAlbum = {
+      ...artist,
+      id: v4(),
+    };
 
-        const [album] =  AlbumRepository.artists.slice(pos, pos + 1);
-        return {album, pos};
-    }
+    AlbumRepository.artists.push(newAlbum);
+    return newAlbum;
+  }
 
-    public create(artist: AlbumDto): AlbumEntity {
-        const newAlbum = {
-            ...artist,
-            id: v4()
-        };
+  public delete(artistAndPosition: AlbumAndPosition): void {
+    const pos = artistAndPosition.pos;
 
-        AlbumRepository.artists.push(newAlbum);
-        return newAlbum;
-    }
+    AlbumRepository.artists.splice(pos, 1);
+  }
 
-    public delete(artistAndPosition: AlbumAndPosition): void {
-        const pos = artistAndPosition.pos;
+  public update(
+    newAlbum: AlbumDto,
+    artistAndPosition: AlbumAndPosition,
+  ): AlbumEntity {
+    const artist = {
+      ...artistAndPosition.album,
+      ...newAlbum,
+    };
 
-        AlbumRepository.artists.splice(pos, 1);
-    }
+    AlbumRepository.artists[artistAndPosition.pos] = artist;
 
-    public update(newAlbum: AlbumDto, artistAndPosition: AlbumAndPosition): AlbumEntity {
-        const artist = {
-            ...artistAndPosition.album,
-            ...newAlbum
-        };
-
-        AlbumRepository.artists[artistAndPosition.pos] = artist;
-
-        return artist;
-    }
+    return artist;
+  }
 }

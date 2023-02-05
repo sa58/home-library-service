@@ -1,55 +1,59 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
-import { ArtistDto } from "./dto/artist.dto";
-import { ArtistEntity } from "./artist.entity";
+import { ArtistDto } from './dto/artist.dto';
+import { ArtistEntity } from './artist.entity';
 
 export interface ArtistAndPosition {
-    artist: ArtistEntity; pos: number;
+  artist: ArtistEntity;
+  pos: number;
 }
 
 @Injectable()
 export class ArtistRepository {
-    static artists: ArtistEntity[] = [];
+  static artists: ArtistEntity[] = [];
 
-    public findAll(): ArtistEntity[] {
-        return ArtistRepository.artists;
+  public findAll(): ArtistEntity[] {
+    return ArtistRepository.artists;
+  }
+
+  public findOne(uuid: string): ArtistAndPosition {
+    const pos = ArtistRepository.artists.findIndex((user) => user.id === uuid);
+
+    if (pos < 0) {
+      return null;
     }
 
-    public findOne(uuid: string): ArtistAndPosition {
-        const pos = ArtistRepository.artists.findIndex(user => user.id === uuid);
+    const [artist] = ArtistRepository.artists.slice(pos, pos + 1);
+    return { artist, pos };
+  }
 
-        if(pos < 0) {
-            return null;
-        }
+  public create(artist: ArtistDto): ArtistEntity {
+    const newArtist = {
+      ...artist,
+      id: v4(),
+    };
 
-        const [artist] =  ArtistRepository.artists.slice(pos, pos + 1);
-        return {artist, pos};
-    }
+    ArtistRepository.artists.push(newArtist);
+    return newArtist;
+  }
 
-    public create(artist: ArtistDto): ArtistEntity {
-        const newArtist = {
-            ...artist,
-            id: v4()
-        };
+  public delete(artistAndPosition: ArtistAndPosition): void {
+    const pos = artistAndPosition.pos;
 
-        ArtistRepository.artists.push(newArtist);
-        return newArtist;
-    }
+    ArtistRepository.artists.splice(pos, 1);
+  }
 
-    public delete(artistAndPosition: ArtistAndPosition): void {
-        const pos = artistAndPosition.pos;
+  public update(
+    newArtist: ArtistDto,
+    artistAndPosition: ArtistAndPosition,
+  ): ArtistEntity {
+    const artist = {
+      ...artistAndPosition.artist,
+      ...newArtist,
+    };
 
-        ArtistRepository.artists.splice(pos, 1);
-    }
+    ArtistRepository.artists[artistAndPosition.pos] = artist;
 
-    public update(newArtist: ArtistDto, artistAndPosition: ArtistAndPosition): ArtistEntity {
-        const artist = {
-            ...artistAndPosition.artist,
-            ...newArtist
-        };
-
-        ArtistRepository.artists[artistAndPosition.pos] = artist;
-
-        return artist;
-    }
+    return artist;
+  }
 }

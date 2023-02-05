@@ -8,14 +8,8 @@ import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
 
 @Module({
-    imports: [
-        UserModule,
-        TrackModule,
-        ArtistModule,
-        AlbumModule,
-        FavsModule
-    ],
-    controllers: [AppController],
-    providers: [AppService],
+  imports: [UserModule, TrackModule, ArtistModule, AlbumModule, FavsModule],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
