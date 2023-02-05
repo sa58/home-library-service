@@ -29,7 +29,7 @@ export class AlbumController {
     async createAlbum(
         @Body() createAlbumDto: AlbumDto
     ): Promise<AlbumEntity> {
-        return this.artistService.create(createAlbumDto);
+        return await this.artistService.create(createAlbumDto);
     }
 
     @Delete(':uuid')

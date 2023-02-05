@@ -3,12 +3,15 @@ import { ArtistDto } from "./dto/artist.dto";
 import { ArtistEntity } from "./artist.entity";
 import { ArtistAndPosition, ArtistRepository } from "./artist.repository";
 import { TrackRepository } from "src/track/track.repository";
+import { FavsRepository } from "src/favs/favs.repository";
 
 @Injectable()
 export class ArtistService {
     constructor(
         private readonly artistRepository: ArtistRepository,
-        private readonly trackRepository: TrackRepository
+        private readonly trackRepository: TrackRepository,
+        private readonly favsRepository: FavsRepository
+
     ) {}
 
     async findAll(): Promise<ArtistEntity[]> {
@@ -31,6 +34,14 @@ export class ArtistService {
 
     async delete(uuid: string): Promise<void> {
         const artistAndPosition = await this.findOne(uuid);
+
+
+        const favs = this.favsRepository.findAll();
+        const isFavExisted = favs.artists.filter(el => el.id === uuid);
+        
+        if(isFavExisted.length) {
+            this.favsRepository.deleteArtistFromFavs(uuid)
+        }
 
         const tracks = this.trackRepository.findTracksByArtistId(artistAndPosition.artist.id)
         console.log(tracks)

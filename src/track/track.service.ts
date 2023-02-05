@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { FavsRepository } from "src/favs/favs.repository";
 import { TrackDto } from "./dto/track.dto";
 import { TrackEntity } from "./track.entity";
 import { TrackAndPosition, TrackRepository } from "./track.repository";
@@ -6,7 +7,8 @@ import { TrackAndPosition, TrackRepository } from "./track.repository";
 @Injectable()
 export class TrackService {
     constructor(
-        private readonly trackRepository: TrackRepository
+        private readonly trackRepository: TrackRepository,
+        private readonly favsRepository: FavsRepository
     ) {}
 
     async findAll(): Promise<TrackEntity[]> {
@@ -29,6 +31,13 @@ export class TrackService {
 
     async delete(uuid: string): Promise<void> {
         const trackAndPosition = await this.findOne(uuid);
+
+        const favs = this.favsRepository.findAll();
+        const isFavExisted = favs.tracks.filter(el => el.id === uuid);
+        
+        if(isFavExisted.length) {
+            this.favsRepository.deleteTrackFromFavs(uuid)
+        }
 
         this.trackRepository.delete(trackAndPosition);
     }
