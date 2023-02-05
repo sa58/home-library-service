@@ -4,13 +4,12 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { validate } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './user.entity';
@@ -26,11 +25,9 @@ export class UserController {
   }
 
   @Get(':uuid')
-  async findOne(@Param('uuid') uuid: string): Promise<UserEntity> {
-    if (!validate(uuid)) {
-      throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
-    }
-
+  async findOne(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+  ): Promise<UserEntity> {
     return (await this.userService.findOne(uuid)).user;
   }
 
@@ -43,22 +40,17 @@ export class UserController {
 
   @Delete(':uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('uuid') uuid: string): Promise<void> {
-    if (!validate(uuid)) {
-      throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
-    }
+  async delete(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+  ): Promise<void> {
     return this.userService.delete(uuid);
   }
 
   @Put(':uuid')
   async update(
-    @Param('uuid') uuid: string,
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<Omit<UserEntity, 'password'>> {
-    if (!validate(uuid)) {
-      throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
-    }
-
     return this.userService.update(uuid, updateUserDto);
   }
 }

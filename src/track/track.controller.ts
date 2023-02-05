@@ -4,13 +4,12 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { validate } from 'uuid';
 import { TrackDto } from './dto/track.dto';
 import { TrackEntity } from './track.entity';
 import { TrackService } from './track.service';
@@ -25,10 +24,9 @@ export class TrackController {
   }
 
   @Get(':uuid')
-  async findOne(@Param('uuid') uuid: string): Promise<TrackEntity> {
-    if (!validate(uuid)) {
-      throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
-    }
+  async findOne(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+  ): Promise<TrackEntity> {
     return (await this.trackService.findOne(uuid)).track;
   }
 
@@ -39,22 +37,17 @@ export class TrackController {
 
   @Delete(':uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('uuid') uuid: string): Promise<void> {
-    if (!validate(uuid)) {
-      throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
-    }
+  async delete(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+  ): Promise<void> {
     return this.trackService.delete(uuid);
   }
 
   @Put(':uuid')
   async update(
-    @Param('uuid') uuid: string,
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
     @Body() trackDto: TrackDto,
   ): Promise<TrackEntity> {
-    if (!validate(uuid)) {
-      throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
-    }
-
     return this.trackService.update(uuid, trackDto);
   }
 }

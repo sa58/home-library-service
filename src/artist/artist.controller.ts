@@ -4,13 +4,12 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { validate } from 'uuid';
 import { ArtistEntity } from './artist.entity';
 import { ArtistService } from './artist.service';
 import { ArtistDto } from './dto/artist.dto';
@@ -25,10 +24,9 @@ export class ArtistController {
   }
 
   @Get(':uuid')
-  async findOne(@Param('uuid') uuid: string): Promise<ArtistEntity> {
-    if (!validate(uuid)) {
-      throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
-    }
+  async findOne(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+  ): Promise<ArtistEntity> {
     return (await this.artistService.findOne(uuid)).artist;
   }
 
@@ -41,22 +39,17 @@ export class ArtistController {
 
   @Delete(':uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('uuid') uuid: string): Promise<void> {
-    if (!validate(uuid)) {
-      throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
-    }
+  async delete(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+  ): Promise<void> {
     return this.artistService.delete(uuid);
   }
 
   @Put(':uuid')
   async update(
-    @Param('uuid') uuid: string,
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
     @Body() artistDto: ArtistDto,
   ): Promise<ArtistEntity> {
-    if (!validate(uuid)) {
-      throw new HttpException('Uuid isn`t valid', HttpStatus.BAD_REQUEST);
-    }
-
     return this.artistService.update(uuid, artistDto);
   }
 }
