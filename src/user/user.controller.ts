@@ -10,6 +10,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './user.entity';
@@ -31,12 +32,12 @@ export class UserController {
   //   return (await this.userService.findOne(uuid)).user;
   // }
 
-  // @Post()
-  // async createUser(
-  //   @Body() createUserDto: CreateUserDto,
-  // ): Promise<Omit<UserEntity, 'password'>> {
-  //   return this.userService.createUser(createUserDto);
-  // }
+  @Post()
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<Omit<UserEntity, 'password'>> {
+    return this.userService.createUser(createUserDto);
+  }
 
   // @Delete(':uuid')
   // @HttpCode(HttpStatus.NO_CONTENT)

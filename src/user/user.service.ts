@@ -1,5 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { v4 } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserAndPosition } from './types/user-and-position.type';
@@ -27,11 +29,31 @@ export class UserService {
   //   return userAndPosition;
   // }
 
-  // async createUser(
-  //   createUserDto: CreateUserDto,
-  // ): Promise<Omit<UserEntity, 'password'>> {
-  //   return this.userRepository.createUser(createUserDto);
-  // }
+  private exclude<UserEntity, Key extends keyof UserEntity>(
+    user: UserEntity,
+    keys: Key[]
+  ): Omit<UserEntity, Key> {
+    for (let key of keys) {
+      delete user[key];
+    }
+    return user;
+  }
+
+  async createUser(
+    createUserDto: CreateUserDto,
+  ): Promise<Omit<UserEntity, 'password'>> {
+
+      const newUser = {
+        ...createUserDto,
+        id: v4(),
+        version: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+    const user = await this.prisma.user.create({data: newUser});
+    return this.exclude(user, ['password']);
+  }
 
   // async delete(uuid: string): Promise<void> {
   //   const userAndPosition = await this.findOne(uuid);
