@@ -3,6 +3,6 @@ export class UserEntity {
   login: string;
   password: string;
   version: number;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

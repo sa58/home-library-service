@@ -15,6 +15,6 @@ model user {
   login       String
   password    String
   version     Int
-  createdAt   DateTime @db.Timestamp()
-  updatedAt   DateTime @db.Timestamp()
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
