@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -9,6 +10,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,12 +19,14 @@ import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 
 @Controller('user')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async findAll(): Promise<CreateUserDto[]> {
-    return this.userService.findAll();
+  async findAll() {
+    const users = await this.userService.findAll();
+    return users.map((user) => new UserEntity(user))
   }
 
   // @Get(':uuid')
