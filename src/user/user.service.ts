@@ -1,12 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserAndPosition } from './types/user-and-position.type';
 import { UserEntity } from './user.entity';
-// import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
