@@ -47,12 +47,11 @@ export class UserService {
         ...createUserDto,
         id: v4(),
         version: 1,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: BigInt(Date.now())
       };
 
     const user = await this.prisma.user.create({data: newUser});
-    return this.exclude(user, ['password']);
+    return user;
   }
 
   // async delete(uuid: string): Promise<void> {

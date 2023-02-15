@@ -40,7 +40,8 @@ export class UserController {
   async createUser(
     @Body() createUserDto: CreateUserDto,
   ): Promise<Omit<UserEntity, 'password'>> {
-    return this.userService.createUser(createUserDto);
+    const createdUser = await this.userService.createUser(createUserDto);
+    return new UserEntity(createdUser);
   }
 
   // @Delete(':uuid')

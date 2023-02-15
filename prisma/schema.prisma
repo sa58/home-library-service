@@ -15,6 +15,6 @@ model user {
   login        String
   password     String
   version      Int
-  createdAt   Int
-  updatedAt   Int?
+  createdAt    BigInt
+  updatedAt    BigInt?
 }

@@ -8,12 +8,12 @@ export class UserEntity {
   @Exclude()
   password: string;
 
-  @Transform(val => 'd')
   version: number;
 
-  createdAt: number;
+  @Transform(val => Number(val.value))
+  createdAt: bigint;
 
-  updatedAt?: number;
+  updatedAt?: bigint;
 
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);
