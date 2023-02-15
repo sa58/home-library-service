@@ -11,7 +11,6 @@ import { UserEntity } from './user.entity';
 @Injectable()
 export class UserService {
   constructor(
-    // private readonly userRepository: UserRepository,
     private prisma: PrismaService
   ) {}
 
@@ -19,52 +18,65 @@ export class UserService {
     return this.prisma.user.findMany();
   }
 
-  // async findOne(uuid: string): Promise<UserAndPosition> {
-  //   const userAndPosition = this.userRepository.findOne(uuid);
+  async findOne(uuid: string): Promise<UserEntity> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: uuid,
+      },
+    });
 
-  //   if (userAndPosition === null) {
-  //     throw new HttpException('NO_CONTENT', HttpStatus.NOT_FOUND);
-  //   }
-
-  //   return userAndPosition;
-  // }
-
-  private exclude<UserEntity, Key extends keyof UserEntity>(
-    user: UserEntity,
-    keys: Key[]
-  ): Omit<UserEntity, Key> {
-    for (let key of keys) {
-      delete user[key];
+    if (user === null) {
+      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
+
     return user;
   }
 
   async createUser(
     createUserDto: CreateUserDto,
   ): Promise<Omit<UserEntity, 'password'>> {
+      const now = BigInt(Date.now());
 
       const newUser = {
         ...createUserDto,
         id: v4(),
         version: 1,
-        createdAt: BigInt(Date.now())
+        createdAt: now,
+        updatedAt: now
       };
 
-    const user = await this.prisma.user.create({data: newUser});
-    return user;
+      return await this.prisma.user.create({data: newUser});
   }
 
-  // async delete(uuid: string): Promise<void> {
-  //   const userAndPosition = await this.findOne(uuid);
-  //   this.userRepository.delete(userAndPosition);
-  // }
+  async delete(uuid: string): Promise<void> {
+    await this.findOne(uuid);
+    
+    await this.prisma.user.delete({
+      where: {
+        id: uuid,
+      },
+    });
+  }
 
-  // async update(
-  //   uuid: string,
-  //   updateUserDto: UpdateUserDto,
-  // ): Promise<Omit<UserEntity, 'password'>> {
-  //   const userAndPosition = await this.findOne(uuid);
+  async update(
+    uuid: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Omit<UserEntity, 'password'>> {
+    const user = await this.findOne(uuid);
 
-  //   return this.userRepository.update(updateUserDto, userAndPosition);
-  // }
+    if (user.password !== updateUserDto.oldPassword) {
+      throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
+    }
+
+    return await this.prisma.user.update({
+      where: {
+        id: uuid,
+      },
+      data: {
+        password: updateUserDto.newPassword,
+        version: user.version + 1,
+        updatedAt: BigInt(Date.now())
+      },
+    });
+  }
 }

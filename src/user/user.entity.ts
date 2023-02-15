@@ -13,6 +13,7 @@ export class UserEntity {
   @Transform(val => Number(val.value))
   createdAt: bigint;
 
+  @Transform(val => Number(val.value))
   updatedAt?: bigint;
 
   constructor(partial: Partial<UserEntity>) {

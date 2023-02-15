@@ -12,7 +12,6 @@ import {
   Put,
   UseInterceptors,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './user.entity';
@@ -29,12 +28,13 @@ export class UserController {
     return users.map((user) => new UserEntity(user))
   }
 
-  // @Get(':uuid')
-  // async findOne(
-  //   @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
-  // ): Promise<UserEntity> {
-  //   return (await this.userService.findOne(uuid)).user;
-  // }
+  @Get(':uuid')
+  async findOne(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+  ): Promise<UserEntity> {
+    const user = await this.userService.findOne(uuid);
+    return new UserEntity(user);
+  }
 
   @Post()
   async createUser(
@@ -44,19 +44,20 @@ export class UserController {
     return new UserEntity(createdUser);
   }
 
-  // @Delete(':uuid')
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // async delete(
-  //   @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
-  // ): Promise<void> {
-  //   return this.userService.delete(uuid);
-  // }
+  @Delete(':uuid')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+  ): Promise<void> {
+    return this.userService.delete(uuid);
+  }
 
-  // @Put(':uuid')
-  // async update(
-  //   @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
-  //   @Body() updateUserDto: UpdateUserDto,
-  // ): Promise<Omit<UserEntity, 'password'>> {
-  //   return this.userService.update(uuid, updateUserDto);
-  // }
+  @Put(':uuid')
+  async update(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<Omit<UserEntity, 'password'>> {
+    const updatedUser = await this.userService.update(uuid, updateUserDto);
+    return new UserEntity(updatedUser);
+  }
 }
