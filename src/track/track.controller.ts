@@ -10,6 +10,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { parseUUIDPipeOptions } from 'src/app.constants';
 import { TrackDto } from './dto/track.dto';
 import { TrackEntity } from './track.entity';
 import { TrackService } from './track.service';
@@ -25,7 +26,7 @@ export class TrackController {
 
   @Get(':uuid')
   async findOne(
-    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
   ): Promise<TrackEntity> {
     return (await this.trackService.findOne(uuid)).track;
   }
@@ -38,14 +39,14 @@ export class TrackController {
   @Delete(':uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
-    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
   ): Promise<void> {
     return this.trackService.delete(uuid);
   }
 
   @Put(':uuid')
   async update(
-    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
     @Body() trackDto: TrackDto,
   ): Promise<TrackEntity> {
     return this.trackService.update(uuid, trackDto);
