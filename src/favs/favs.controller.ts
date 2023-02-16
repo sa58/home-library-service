@@ -34,9 +34,8 @@ export class FavsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTrackFromFavs(
     @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
-  ): Promise<string> {
+  ): Promise<void> {
     await this.favsService.deleteTrackFromFavs(uuid);
-    return `${uuid} deleted from favourites`;
   }
 
   @Post('artist/:uuid')
@@ -52,9 +51,8 @@ export class FavsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteArtistFromFavs(
     @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
-  ): Promise<string> {
+  ): Promise<void> {
     await this.favsService.deleteArtistFromFavs(uuid);
-    return `${uuid} deleted from favourites`;
   }
 
   @Post('album/:uuid')
@@ -70,8 +68,7 @@ export class FavsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAlbumFromFavs(
     @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
-  ): Promise<string> {
+  ): Promise<void> {
     await this.favsService.deleteAlbumFromFavs(uuid);
-    return `${uuid} deleted from favourites`;
   }
 }

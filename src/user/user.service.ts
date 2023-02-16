@@ -7,9 +7,7 @@ import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private prisma: PrismaService
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async findAll(): Promise<UserEntity[]> {
     return this.prisma.user.findMany();
@@ -32,22 +30,22 @@ export class UserService {
   async createUser(
     createUserDto: CreateUserDto,
   ): Promise<Omit<UserEntity, 'password'>> {
-      const now = BigInt(Date.now());
+    const now = BigInt(Date.now());
 
-      const newUser = {
-        ...createUserDto,
-        id: v4(),
-        version: 1,
-        createdAt: now,
-        updatedAt: now
-      };
+    const newUser = {
+      ...createUserDto,
+      id: v4(),
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+    };
 
-      return await this.prisma.user.create({data: newUser});
+    return await this.prisma.user.create({ data: newUser });
   }
 
   async delete(uuid: string): Promise<void> {
     await this.findOne(uuid);
-    
+
     await this.prisma.user.delete({
       where: {
         id: uuid,
@@ -72,7 +70,7 @@ export class UserService {
       data: {
         password: updateUserDto.newPassword,
         version: user.version + 1,
-        updatedAt: BigInt(Date.now())
+        updatedAt: BigInt(Date.now()),
       },
     });
   }

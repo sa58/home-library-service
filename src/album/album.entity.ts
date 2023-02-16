@@ -3,4 +3,8 @@ export class AlbumEntity {
   name: string;
   year: number;
   artistId: string | null;
+
+  constructor(partial: Partial<AlbumEntity>) {
+    Object.assign(this, partial);
+  }
 }

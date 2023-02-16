@@ -1,95 +1,94 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import { AlbumRepository } from 'src/album/album.repository';
-import { ArtistRepository } from 'src/artist/artist.repository';
-import { TrackRepository } from 'src/track/track.repository';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { AlbumService } from 'src/album/album.service';
+import { ArtistService } from 'src/artist/artist.service';
+import { PrismaService } from 'src/prisma.service';
+import { TrackService } from 'src/track/track.service';
 import { FavsEntity } from './favs.entity';
-import { FavsRepository } from './favs.repository';
 
 @Injectable()
 export class FavsService {
   constructor(
-    private readonly favsRepository: FavsRepository,
-    private readonly trackRepository: TrackRepository,
-    private readonly artistRepository: ArtistRepository,
-    private readonly albumRepository: AlbumRepository,
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => ArtistService))
+    private artistService: ArtistService,
+    @Inject(forwardRef(() => AlbumService))
+    private albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService))
+    private trackService: TrackService,
   ) {}
 
   async findAll(): Promise<FavsEntity> {
-    return this.favsRepository.findAll();
+    const artists = await this.prisma.favourite_artist.findMany({
+      include: {
+        artist: true,
+      },
+    });
+
+    const albums = await this.prisma.favourite_album.findMany({
+      include: {
+        album: true,
+      },
+    });
+
+    const tracks = await this.prisma.favourite_track.findMany({
+      include: {
+        track: true,
+      },
+    });
+
+    const response = {
+      artists: artists.map((el) => el.artist),
+      albums: albums.map((el) => el.album),
+      tracks: tracks.map((el) => el.track),
+    };
+
+    return response;
   }
 
   async addTrackToFavs(uuid: string): Promise<void> {
-    const trackAndPosition = this.trackRepository.findOne(uuid);
-
-    if (trackAndPosition === null) {
-      throw new HttpException(
-        'UNPROCESSABLE_ENTITY',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    this.favsRepository.addTrackToFavs(trackAndPosition.track);
+    await this.trackService.findOneForFavsModule(uuid);
+    await this.prisma.favourite_track.create({ data: { trackId: uuid } });
   }
 
   async deleteTrackFromFavs(uuid: string): Promise<void> {
-    const trackAndPosition = this.trackRepository.findOne(uuid);
+    await this.trackService.findOneForFavsModule(uuid);
 
-    if (trackAndPosition === null) {
-      throw new HttpException(
-        'UNPROCESSABLE_ENTITY',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    this.favsRepository.deleteTrackFromFavs(trackAndPosition.track.id);
+    await this.prisma.favourite_track.delete({
+      where: {
+        trackId: uuid,
+      },
+    });
   }
 
   async deleteArtistFromFavs(uuid: string): Promise<void> {
-    const artist = this.artistRepository.findOne(uuid);
+    await this.artistService.findOneForFavsModule(uuid);
 
-    if (artist === null) {
-      throw new HttpException(
-        'UNPROCESSABLE_ENTITY',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    this.favsRepository.deleteArtistFromFavs(artist.artist.id);
+    await this.prisma.favourite_artist.delete({
+      where: {
+        artistId: uuid,
+      },
+    });
   }
 
   async addArtistToFavs(uuid: string): Promise<void> {
-    const artistAndPosition = this.artistRepository.findOne(uuid);
-    if (artistAndPosition === null) {
-      throw new UnprocessableEntityException();
-    }
+    await this.artistService.findOneForFavsModule(uuid);
 
-    this.favsRepository.addArtistToFavs(artistAndPosition.artist);
+    await this.prisma.favourite_artist.create({ data: { artistId: uuid } });
   }
 
   async addAlbumToFavs(uuid: string): Promise<void> {
-    const albumAndPosition = this.albumRepository.findOne(uuid);
-    if (albumAndPosition === null) {
-      throw new UnprocessableEntityException();
-    }
+    await this.albumService.findOneForFavsModule(uuid);
 
-    this.favsRepository.addAlbumToFavs(albumAndPosition.album);
+    await this.prisma.favourite_album.create({ data: { albumId: uuid } });
   }
 
   async deleteAlbumFromFavs(uuid: string): Promise<void> {
-    const albumAndPosition = this.albumRepository.findOne(uuid);
+    await this.albumService.findOneForFavsModule(uuid);
 
-    if (albumAndPosition === null) {
-      throw new HttpException(
-        'UNPROCESSABLE_ENTITY',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    this.favsRepository.deleteAlbumFromFavs(albumAndPosition.album.id);
+    await this.prisma.favourite_album.delete({
+      where: {
+        albumId: uuid,
+      },
+    });
   }
 }

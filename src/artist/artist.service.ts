@@ -1,71 +1,121 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { ArtistDto } from './dto/artist.dto';
 import { ArtistEntity } from './artist.entity';
-import { ArtistAndPosition, ArtistRepository } from './artist.repository';
-import { TrackRepository } from 'src/track/track.repository';
-import { FavsRepository } from 'src/favs/favs.repository';
+import { PrismaService } from 'src/prisma.service';
+import { v4 } from 'uuid';
+import { FavsService } from 'src/favs/favs.service';
 
 @Injectable()
 export class ArtistService {
   constructor(
-    private readonly artistRepository: ArtistRepository,
-    private readonly trackRepository: TrackRepository,
-    private readonly favsRepository: FavsRepository,
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
   ) {}
 
   async findAll(): Promise<ArtistEntity[]> {
-    return this.artistRepository.findAll();
+    return this.prisma.artist.findMany();
   }
 
-  async findOne(uuid: string): Promise<ArtistAndPosition> {
-    const artistAndPosition = this.artistRepository.findOne(uuid);
+  async findOne(uuid: string): Promise<ArtistEntity> {
+    const artist = await this.prisma.artist.findUnique({
+      where: {
+        id: uuid,
+      },
+    });
 
-    if (artistAndPosition === null) {
-      throw new HttpException('NO_CONTENT', HttpStatus.NOT_FOUND);
+    if (artist === null) {
+      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    return artistAndPosition;
+    return artist;
+  }
+
+  async findOneForFavsModule(uuid: string): Promise<void> {
+    const artist = await this.prisma.artist.findUnique({
+      where: {
+        id: uuid,
+      },
+    });
+
+    if (artist === null) {
+      throw new HttpException('UNPROCESSABLE', HttpStatus.UNPROCESSABLE_ENTITY);
+    }
   }
 
   async create(createArtistDto: ArtistDto): Promise<ArtistEntity> {
-    return this.artistRepository.create(createArtistDto);
+    const newArtist = {
+      id: v4(),
+      ...createArtistDto,
+    };
+
+    return await this.prisma.artist.create({ data: newArtist });
   }
 
   async delete(uuid: string): Promise<void> {
-    const artistAndPosition = await this.findOne(uuid);
+    await this.findOne(uuid);
 
-    const favs = this.favsRepository.findAll();
-    const isFavExisted = favs.artists.filter((el) => el.id === uuid);
+    const favs = await this.prisma.favourite_artist.findUnique({
+      where: {
+        artistId: uuid,
+      },
+    });
 
-    if (isFavExisted.length) {
-      this.favsRepository.deleteArtistFromFavs(uuid);
+    if (favs) {
+      await this.favsService.deleteArtistFromFavs(uuid);
     }
 
-    const tracks = this.trackRepository.findTracksByArtistId(
-      artistAndPosition.artist.id,
-    );
-    console.log(tracks);
+    await this.prisma.artist.delete({
+      where: {
+        id: uuid,
+      },
+    });
 
-    if (tracks.length) {
-      tracks.forEach((track) => {
-        // TODO: get position is waste
-        const trackAndPosition = this.trackRepository.findOne(track.id);
+    // const isFavExisted = favs.artists.filter((el) => el.id === uuid);
 
-        const newTrack = {
-          ...trackAndPosition.track,
-          artistId: null,
-        };
+    // if (isFavExisted.length) {
+    //   this.favsRepository.deleteArtistFromFavs(uuid);
+    // }
 
-        this.trackRepository.update(newTrack, trackAndPosition);
-      });
-    }
+    // const tracks = this.trackRepository.findTracksByArtistId(
+    //   artistAndPosition.artist.id,
+    // );
+    // console.log(tracks);
 
-    this.artistRepository.delete(artistAndPosition);
+    // if (tracks.length) {
+    //   tracks.forEach((track) => {
+    //     // TODO: get position is waste
+    //     const trackAndPosition = this.trackRepository.findOne(track.id);
+
+    //     const newTrack = {
+    //       ...trackAndPosition.track,
+    //       artistId: null,
+    //     };
+
+    //     this.trackRepository.update(newTrack, trackAndPosition);
+    //   });
+    // }
+
+    // this.artistRepository.delete(artistAndPosition);
   }
 
   async update(uuid: string, artistDto: ArtistDto): Promise<ArtistEntity> {
-    const artistAndPosition = await this.findOne(uuid);
+    const artist = await this.findOne(uuid);
 
-    return this.artistRepository.update(artistDto, artistAndPosition);
+    return await this.prisma.artist.update({
+      where: {
+        id: uuid,
+      },
+      data: {
+        ...artist,
+        ...artistDto,
+      },
+    });
   }
 }

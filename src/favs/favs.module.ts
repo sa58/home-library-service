@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AlbumRepository } from 'src/album/album.repository';
-import { ArtistRepository } from 'src/artist/artist.repository';
-import { TrackRepository } from 'src/track/track.repository';
+import { AlbumService } from 'src/album/album.service';
+import { ArtistModule } from 'src/artist/artist.module';
+import { ArtistService } from 'src/artist/artist.service';
+import { PrismaService } from 'src/prisma.service';
+import { TrackService } from 'src/track/track.service';
 import { FavsController } from './favs.controller';
 import { FavsRepository } from './favs.repository';
 import { FavsService } from './favs.service';
@@ -11,10 +13,12 @@ import { FavsService } from './favs.service';
   providers: [
     FavsService,
     FavsRepository,
-    TrackRepository,
-    ArtistRepository,
-    AlbumRepository,
+    PrismaService,
+    ArtistService,
+    AlbumService,
+    TrackService,
   ],
-  exports: [FavsRepository],
+  // imports: [ArtistModule],
+  exports: [FavsModule],
 })
 export class FavsModule {}

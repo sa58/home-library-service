@@ -26,7 +26,7 @@ export class UserController {
   @Get()
   async findAll() {
     const users = await this.userService.findAll();
-    return users.map((user) => new UserEntity(user))
+    return users.map((user) => new UserEntity(user));
   }
 
   @Get(':uuid')

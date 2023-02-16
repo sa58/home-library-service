@@ -21,19 +21,22 @@ export class TrackController {
 
   @Get()
   async findAll(): Promise<TrackEntity[]> {
-    return this.trackService.findAll();
+    const tracks = await this.trackService.findAll();
+    return tracks.map((track) => new TrackEntity(track));
   }
 
   @Get(':uuid')
   async findOne(
     @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
   ): Promise<TrackEntity> {
-    return (await this.trackService.findOne(uuid)).track;
+    const track = await this.trackService.findOne(uuid);
+    return new TrackEntity(track);
   }
 
   @Post()
   async createTrack(@Body() createTrackDto: TrackDto): Promise<TrackEntity> {
-    return this.trackService.create(createTrackDto);
+    const createdTrack = await this.trackService.create(createTrackDto);
+    return new TrackEntity(createdTrack);
   }
 
   @Delete(':uuid')
@@ -49,6 +52,7 @@ export class TrackController {
     @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
     @Body() trackDto: TrackDto,
   ): Promise<TrackEntity> {
-    return this.trackService.update(uuid, trackDto);
+    const updatedTrack = await this.trackService.update(uuid, trackDto);
+    return new TrackEntity(updatedTrack);
   }
 }
