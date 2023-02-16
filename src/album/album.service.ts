@@ -1,71 +1,94 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { AlbumDto } from './dto/album.dto';
-import { AlbumRepository } from './album.repository';
 import { AlbumEntity } from './album.entity';
-import { AlbumAndPosition } from './types/album-and-position.type';
-import { TrackRepository } from 'src/track/track.repository';
-import { FavsRepository } from 'src/favs/favs.repository';
+import { PrismaService } from 'src/prisma.service';
+import { v4 } from 'uuid';
+import { FavsService } from 'src/favs/favs.service';
 
 @Injectable()
 export class AlbumService {
   constructor(
-    private readonly albumRepository: AlbumRepository,
-    private readonly trackRepository: TrackRepository,
-    private readonly favsRepository: FavsRepository,
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
   ) {}
 
   async findAll(): Promise<AlbumEntity[]> {
-    return this.albumRepository.findAll();
+    return this.prisma.album.findMany();
   }
 
-  async findOne(uuid: string): Promise<AlbumAndPosition> {
-    const albumAndPosition = this.albumRepository.findOne(uuid);
+  async findOne(uuid: string): Promise<AlbumEntity> {
+    const album = await this.prisma.album.findUnique({
+      where: {
+        id: uuid,
+      },
+    });
 
-    const favs = this.favsRepository.findAll();
-    const isFavExisted = favs.albums.filter((el) => el.id === uuid);
-
-    if (isFavExisted.length) {
-      this.favsRepository.deleteAlbumFromFavs(uuid);
-    }
-
-    if (albumAndPosition === null) {
+    if (album === null) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
-    return albumAndPosition;
+    return album;
+  }
+
+  async findOneForFavsModule(uuid: string): Promise<void> {
+    const album = await this.prisma.album.findUnique({
+      where: {
+        id: uuid,
+      },
+    });
+
+    if (album === null) {
+      throw new HttpException('UNPROCESSABLE', HttpStatus.UNPROCESSABLE_ENTITY);
+    }
   }
 
   async create(createAlbumDto: AlbumDto): Promise<AlbumEntity> {
-    return this.albumRepository.create(createAlbumDto);
+    const newAlbum = {
+      id: v4(),
+      ...createAlbumDto,
+    };
+
+    return await this.prisma.album.create({ data: newAlbum });
   }
 
   async delete(uuid: string): Promise<void> {
-    const albumAndPosition = await this.findOne(uuid);
+    await this.findOne(uuid);
 
-    const tracks = this.trackRepository.findTracksByAlbumId(
-      albumAndPosition.album.id,
-    );
+    const favs = await this.prisma.favourite_album.findUnique({
+      where: {
+        albumId: uuid,
+      },
+    });
 
-    if (tracks.length) {
-      tracks.forEach((track) => {
-        // TODO: get position is waste
-        const trackAndPosition = this.trackRepository.findOne(track.id);
-
-        const newTrack = {
-          ...trackAndPosition.track,
-          albumId: null,
-        };
-
-        this.trackRepository.update(newTrack, trackAndPosition);
-      });
+    if (favs) {
+      await this.favsService.deleteAlbumFromFavs(uuid);
     }
 
-    this.albumRepository.delete(albumAndPosition);
+    await this.prisma.album.delete({
+      where: {
+        id: uuid,
+      },
+    });
   }
 
   async update(uuid: string, albumDto: AlbumDto): Promise<AlbumEntity> {
-    const albumAndPosition = await this.findOne(uuid);
+    const album = await this.findOne(uuid);
 
-    return this.albumRepository.update(albumDto, albumAndPosition);
+    return await this.prisma.album.update({
+      where: {
+        id: uuid,
+      },
+      data: {
+        ...album,
+        ...albumDto,
+      },
+    });
   }
 }

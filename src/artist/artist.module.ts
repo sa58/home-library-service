@@ -1,13 +1,21 @@
 import { Module } from '@nestjs/common';
-import { FavsRepository } from 'src/favs/favs.repository';
-import { TrackRepository } from 'src/track/track.repository';
+import { AlbumService } from 'src/album/album.service';
+import { FavsService } from 'src/favs/favs.service';
+import { PrismaService } from 'src/prisma.service';
+import { TrackService } from 'src/track/track.service';
 import { ArtistController } from './artist.controller';
-import { ArtistRepository } from './artist.repository';
 import { ArtistService } from './artist.service';
 
 @Module({
   controllers: [ArtistController],
-  providers: [ArtistService, ArtistRepository, TrackRepository, FavsRepository],
-  exports: [ArtistRepository],
+  providers: [
+    ArtistService,
+    AlbumService,
+    TrackService,
+    PrismaService,
+    FavsService,
+  ],
+  imports: [],
+  exports: [ArtistModule],
 })
 export class ArtistModule {}

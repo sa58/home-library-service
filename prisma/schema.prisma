@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id          String @id @unique
+  login       String
+  password    String
+  version     Int
+  createdAt   BigInt @db.BigInt
+  updatedAt   BigInt? @db.BigInt
+}
+
+model artist {
+  id      String @db.Uuid @id @unique
+  name    String
+  grammy  Boolean
+
+  albums album[]
+  tracks track[]
+  favourite_artist favourite_artist?
+}
+
+model album {
+  id       String @db.Uuid @id @unique
+  name     String
+  year     Int
+  artistId String? @db.Uuid
+
+  artist   artist? @relation(fields: [artistId], references: [id])
+  tracks   track[]
+  favourite_album favourite_album?
+}
+
+model track {
+  id       String @db.Uuid @id @unique
+  name     String
+  duration Int
+  artistId String? @db.Uuid
+  albumId  String? @db.Uuid
+
+  artist   artist? @relation(fields: [artistId], references: [id])
+  album    album?  @relation(fields: [albumId], references: [id])
+  favourite_track favourite_track?
+}
+
+model favourite_artist {
+  id       Int @id @unique @default(autoincrement())
+  artistId String @db.Uuid @unique
+
+  artist   artist? @relation(fields: [artistId], references: [id])
+}
+
+model favourite_album {
+  id       Int @id @unique @default(autoincrement())
+  albumId String @db.Uuid @unique
+
+  album   album? @relation(fields: [albumId], references: [id])
+}
+
+model favourite_track {
+  id       Int @id @unique @default(autoincrement())
+  trackId String @db.Uuid @unique
+
+  track   track? @relation(fields: [trackId], references: [id])
+}

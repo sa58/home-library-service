@@ -10,6 +10,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { parseUUIDPipeOptions } from 'src/app.constants';
 import { TrackDto } from './dto/track.dto';
 import { TrackEntity } from './track.entity';
 import { TrackService } from './track.service';
@@ -20,34 +21,38 @@ export class TrackController {
 
   @Get()
   async findAll(): Promise<TrackEntity[]> {
-    return this.trackService.findAll();
+    const tracks = await this.trackService.findAll();
+    return tracks.map((track) => new TrackEntity(track));
   }
 
   @Get(':uuid')
   async findOne(
-    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
   ): Promise<TrackEntity> {
-    return (await this.trackService.findOne(uuid)).track;
+    const track = await this.trackService.findOne(uuid);
+    return new TrackEntity(track);
   }
 
   @Post()
   async createTrack(@Body() createTrackDto: TrackDto): Promise<TrackEntity> {
-    return this.trackService.create(createTrackDto);
+    const createdTrack = await this.trackService.create(createTrackDto);
+    return new TrackEntity(createdTrack);
   }
 
   @Delete(':uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
-    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
   ): Promise<void> {
     return this.trackService.delete(uuid);
   }
 
   @Put(':uuid')
   async update(
-    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
     @Body() trackDto: TrackDto,
   ): Promise<TrackEntity> {
-    return this.trackService.update(uuid, trackDto);
+    const updatedTrack = await this.trackService.update(uuid, trackDto);
+    return new TrackEntity(updatedTrack);
   }
 }

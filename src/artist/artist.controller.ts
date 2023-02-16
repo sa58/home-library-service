@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -9,47 +10,54 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
+import { parseUUIDPipeOptions } from 'src/app.constants';
 import { ArtistEntity } from './artist.entity';
 import { ArtistService } from './artist.service';
 import { ArtistDto } from './dto/artist.dto';
 
 @Controller('artist')
+@UseInterceptors(ClassSerializerInterceptor)
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
   @Get()
   async findAll(): Promise<ArtistEntity[]> {
-    return this.artistService.findAll();
+    const artists = await this.artistService.findAll();
+    return artists.map((artist) => new ArtistEntity(artist));
   }
 
   @Get(':uuid')
   async findOne(
-    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
   ): Promise<ArtistEntity> {
-    return (await this.artistService.findOne(uuid)).artist;
+    const artist = await this.artistService.findOne(uuid);
+    return new ArtistEntity(artist);
   }
 
   @Post()
   async createArtist(
     @Body() createArtistDto: ArtistDto,
   ): Promise<ArtistEntity> {
-    return this.artistService.create(createArtistDto);
+    const createdArtist = await this.artistService.create(createArtistDto);
+    return new ArtistEntity(createdArtist);
   }
 
   @Delete(':uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
-    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
   ): Promise<void> {
-    return this.artistService.delete(uuid);
+    return await this.artistService.delete(uuid);
   }
 
   @Put(':uuid')
   async update(
-    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+    @Param('uuid', new ParseUUIDPipe(parseUUIDPipeOptions)) uuid: string,
     @Body() artistDto: ArtistDto,
   ): Promise<ArtistEntity> {
-    return this.artistService.update(uuid, artistDto);
+    const updatedArtist = await this.artistService.update(uuid, artistDto);
+    return new ArtistEntity(updatedArtist);
   }
 }
