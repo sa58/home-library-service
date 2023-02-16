@@ -76,27 +76,6 @@ export class AlbumService {
         id: uuid,
       },
     });
-    // const albumAndPosition = await this.findOne(uuid);
-
-    // const tracks = this.trackRepository.findTracksByAlbumId(
-    //   albumAndPosition.album.id,
-    // );
-
-    // if (tracks.length) {
-    //   tracks.forEach((track) => {
-    //     // TODO: get position is waste
-    //     const trackAndPosition = this.trackRepository.findOne(track.id);
-
-    //     const newTrack = {
-    //       ...trackAndPosition.track,
-    //       albumId: null,
-    //     };
-
-    //     this.trackRepository.update(newTrack, trackAndPosition);
-    //   });
-    // }
-
-    // this.albumRepository.delete(albumAndPosition);
   }
 
   async update(uuid: string, albumDto: AlbumDto): Promise<AlbumEntity> {

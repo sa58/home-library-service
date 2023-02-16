@@ -15,7 +15,6 @@ import { FavsService } from 'src/favs/favs.service';
 export class ArtistService {
   constructor(
     private prisma: PrismaService,
-    @Inject(forwardRef(() => FavsService))
     private favsService: FavsService,
   ) {}
 
@@ -76,33 +75,6 @@ export class ArtistService {
         id: uuid,
       },
     });
-
-    // const isFavExisted = favs.artists.filter((el) => el.id === uuid);
-
-    // if (isFavExisted.length) {
-    //   this.favsRepository.deleteArtistFromFavs(uuid);
-    // }
-
-    // const tracks = this.trackRepository.findTracksByArtistId(
-    //   artistAndPosition.artist.id,
-    // );
-    // console.log(tracks);
-
-    // if (tracks.length) {
-    //   tracks.forEach((track) => {
-    //     // TODO: get position is waste
-    //     const trackAndPosition = this.trackRepository.findOne(track.id);
-
-    //     const newTrack = {
-    //       ...trackAndPosition.track,
-    //       artistId: null,
-    //     };
-
-    //     this.trackRepository.update(newTrack, trackAndPosition);
-    //   });
-    // }
-
-    // this.artistRepository.delete(artistAndPosition);
   }
 
   async update(uuid: string, artistDto: ArtistDto): Promise<ArtistEntity> {

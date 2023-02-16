@@ -76,16 +76,6 @@ export class TrackService {
         id: uuid,
       },
     });
-    // const trackAndPosition = await this.findOne(uuid);
-
-    // const favs = this.favsRepository.findAll();
-    // const isFavExisted = favs.tracks.filter((el) => el.id === uuid);
-
-    // if (isFavExisted.length) {
-    //   this.favsRepository.deleteTrackFromFavs(uuid);
-    // }
-
-    // this.trackRepository.delete(trackAndPosition);
   }
 
   async update(uuid: string, trackDto: TrackDto): Promise<TrackEntity> {
