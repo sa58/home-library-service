@@ -1,10 +1,4 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ArtistDto } from './dto/artist.dto';
 import { ArtistEntity } from './artist.entity';
 import { PrismaService } from 'src/prisma.service';

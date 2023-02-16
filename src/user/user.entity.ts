@@ -1,4 +1,4 @@
-import { Exclude, Expose, Transform } from "class-transformer";
+import { Exclude, Transform } from 'class-transformer';
 
 export class UserEntity {
   id: string;
@@ -10,10 +10,10 @@ export class UserEntity {
 
   version: number;
 
-  @Transform(val => Number(val.value))
+  @Transform((val) => Number(val.value))
   createdAt: bigint;
 
-  @Transform(val => Number(val.value))
+  @Transform((val) => Number(val.value))
   updatedAt?: bigint;
 
   constructor(partial: Partial<UserEntity>) {
