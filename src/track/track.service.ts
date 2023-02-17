@@ -61,7 +61,7 @@ export class TrackService {
   async delete(uuid: string): Promise<void> {
     await this.findOne(uuid);
 
-    const favs = await this.prisma.favourite_track.findUnique({
+    const favs = await this.prisma.favourite.findUnique({
       where: {
         trackId: uuid,
       },
