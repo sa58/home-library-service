@@ -54,7 +54,7 @@ export class ArtistService {
   async delete(uuid: string): Promise<void> {
     await this.findOne(uuid);
 
-    const favs = await this.prisma.favourite_artist.findUnique({
+    const favs = await this.prisma.favourite.findUnique({
       where: {
         artistId: uuid,
       },

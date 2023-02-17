@@ -26,7 +26,7 @@ model artist {
 
   albums album[]
   tracks track[]
-  favourite_artist favourite_artist?
+  favourite favourite?
 }
 
 model album {
@@ -37,7 +37,7 @@ model album {
 
   artist   artist? @relation(fields: [artistId], references: [id])
   tracks   track[]
-  favourite_album favourite_album?
+  favourite favourite?
 }
 
 model track {
@@ -49,26 +49,16 @@ model track {
 
   artist   artist? @relation(fields: [artistId], references: [id])
   album    album?  @relation(fields: [albumId], references: [id])
-  favourite_track favourite_track?
+  favourite favourite?
 }
 
-model favourite_artist {
+model favourite {
   id       Int @id @unique @default(autoincrement())
-  artistId String @db.Uuid @unique
+  artistId String? @db.Uuid @unique
+  albumId  String? @db.Uuid @unique
+  trackId  String? @db.Uuid @unique
 
   artist   artist? @relation(fields: [artistId], references: [id])
-}
-
-model favourite_album {
-  id       Int @id @unique @default(autoincrement())
-  albumId String @db.Uuid @unique
-
-  album   album? @relation(fields: [albumId], references: [id])
-}
-
-model favourite_track {
-  id       Int @id @unique @default(autoincrement())
-  trackId String @db.Uuid @unique
-
-  track   track? @relation(fields: [trackId], references: [id])
+  album    album? @relation(fields: [albumId], references: [id])
+  track    track? @relation(fields: [trackId], references: [id])
 }

@@ -61,7 +61,7 @@ export class AlbumService {
   async delete(uuid: string): Promise<void> {
     await this.findOne(uuid);
 
-    const favs = await this.prisma.favourite_album.findUnique({
+    const favs = await this.prisma.favourite.findUnique({
       where: {
         albumId: uuid,
       },

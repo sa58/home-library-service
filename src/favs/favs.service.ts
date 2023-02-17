@@ -18,19 +18,34 @@ export class FavsService {
   ) {}
 
   async findAll(): Promise<FavsEntity> {
-    const artists = await this.prisma.favourite_artist.findMany({
+    const artists = await this.prisma.favourite.findMany({
+      where: {
+        NOT: {
+          artistId: null,
+        },
+      },
       include: {
         artist: true,
       },
     });
 
-    const albums = await this.prisma.favourite_album.findMany({
+    const albums = await this.prisma.favourite.findMany({
+      where: {
+        NOT: {
+          albumId: null,
+        },
+      },
       include: {
         album: true,
       },
     });
 
-    const tracks = await this.prisma.favourite_track.findMany({
+    const tracks = await this.prisma.favourite.findMany({
+      where: {
+        NOT: {
+          trackId: null,
+        },
+      },
       include: {
         track: true,
       },
@@ -47,13 +62,13 @@ export class FavsService {
 
   async addTrackToFavs(uuid: string): Promise<void> {
     await this.trackService.findOneForFavsModule(uuid);
-    await this.prisma.favourite_track.create({ data: { trackId: uuid } });
+    await this.prisma.favourite.create({ data: { trackId: uuid } });
   }
 
   async deleteTrackFromFavs(uuid: string): Promise<void> {
     await this.trackService.findOneForFavsModule(uuid);
 
-    await this.prisma.favourite_track.delete({
+    await this.prisma.favourite.delete({
       where: {
         trackId: uuid,
       },
@@ -63,7 +78,7 @@ export class FavsService {
   async deleteArtistFromFavs(uuid: string): Promise<void> {
     await this.artistService.findOneForFavsModule(uuid);
 
-    await this.prisma.favourite_artist.delete({
+    await this.prisma.favourite.delete({
       where: {
         artistId: uuid,
       },
@@ -73,19 +88,19 @@ export class FavsService {
   async addArtistToFavs(uuid: string): Promise<void> {
     await this.artistService.findOneForFavsModule(uuid);
 
-    await this.prisma.favourite_artist.create({ data: { artistId: uuid } });
+    await this.prisma.favourite.create({ data: { artistId: uuid } });
   }
 
   async addAlbumToFavs(uuid: string): Promise<void> {
     await this.albumService.findOneForFavsModule(uuid);
 
-    await this.prisma.favourite_album.create({ data: { albumId: uuid } });
+    await this.prisma.favourite.create({ data: { albumId: uuid } });
   }
 
   async deleteAlbumFromFavs(uuid: string): Promise<void> {
     await this.albumService.findOneForFavsModule(uuid);
 
-    await this.prisma.favourite_album.delete({
+    await this.prisma.favourite.delete({
       where: {
         albumId: uuid,
       },
