@@ -1,5 +1,19 @@
 # Home Library Service
 
+## Steps to run for review
+
+| Step | Command                                      |
+| ---- | -------------------------------------------- |
+| 1    | `git clone {repository URL}`                 |
+| 2    | `cd home-library-service`                    |
+| 3    | `git checkout dev`                           |
+| 4    | `npm install` with nodejs 14v                |
+| 5    | copy `.env.example` and rename it to  `.env` |
+| 6    | `docker-compose up -d --build`               |
+| 7    | `npx prisma migrate dev`                     |
+| 8    | lunch `npm run start:dev`, `npm run test` in different terminals|
+
+
 ## Prerequisites
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
