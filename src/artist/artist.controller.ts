@@ -19,12 +19,12 @@ import { ArtistEntity } from './artist.entity';
 import { ArtistService } from './artist.service';
 import { ArtistDto } from './dto/artist.dto';
 
+@UseGuards(AuthGuard)
 @Controller('artist')
 @UseInterceptors(ClassSerializerInterceptor)
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
-  @UseGuards(AuthGuard)
   @Get()
   async findAll(): Promise<ArtistEntity[]> {
     const artists = await this.artistService.findAll();
