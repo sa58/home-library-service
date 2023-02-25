@@ -14,7 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { parseUUIDPipeOptions } from 'src/app.constants';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { ArtistEntity } from './artist.entity';
 import { ArtistService } from './artist.service';
 import { ArtistDto } from './dto/artist.dto';

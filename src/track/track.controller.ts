@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { parseUUIDPipeOptions } from 'src/app.constants';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { TrackDto } from './dto/track.dto';
 import { TrackEntity } from './track.entity';
 import { TrackService } from './track.service';

@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { parseUUIDPipeOptions } from 'src/app.constants';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { AlbumEntity } from './album.entity';
 import { AlbumService } from './album.service';
 import { AlbumDto } from './dto/album.dto';

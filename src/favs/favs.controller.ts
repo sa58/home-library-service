@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { parseUUIDPipeOptions } from 'src/app.constants';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { FavsEntity } from './favs.entity';
 import { FavsService } from './favs.service';
 
