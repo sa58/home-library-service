@@ -10,9 +10,11 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { parseUUIDPipeOptions } from 'src/app.constants';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { ArtistEntity } from './artist.entity';
 import { ArtistService } from './artist.service';
 import { ArtistDto } from './dto/artist.dto';
@@ -22,6 +24,7 @@ import { ArtistDto } from './dto/artist.dto';
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
+  @UseGuards(AuthGuard)
   @Get()
   async findAll(): Promise<ArtistEntity[]> {
     const artists = await this.artistService.findAll();

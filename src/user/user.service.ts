@@ -32,7 +32,6 @@ export class UserService {
     createUserDto: CreateUserDto,
   ): Promise<Omit<UserEntity, 'password'>> {
     const now = BigInt(Date.now());
-
     const newUser = {
       ...createUserDto,
       id: v4(),

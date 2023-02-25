@@ -2,14 +2,7 @@ import {
     Body,
     ClassSerializerInterceptor,
     Controller,
-    Delete,
-    Get,
-    HttpCode,
-    HttpStatus,
-    Param,
-    ParseUUIDPipe,
     Post,
-    Put,
     UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -21,13 +14,18 @@ import { AuthService } from './auth.service';
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
     constructor(
-        // private readonly authService: AuthService,
+        private readonly authService: AuthService,
         private readonly userService: UserService
     ) {}
 
-    @Get('/signup')
+    @Post('/signup')
     async signUp(@Body() createUserDto: CreateUserDto) {
         const createdUser =  await this.userService.signUpUser(createUserDto);
         return new UserEntity(createdUser);
+    }
+
+    @Post('/login')
+    async logIn(@Body() createUserDto: CreateUserDto) {
+        return await this.authService.logIn(createUserDto);
     }
 }

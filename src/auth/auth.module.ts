@@ -8,10 +8,12 @@ import { AuthService } from './auth.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService,    UserService,
-    PrismaService],
+  providers: [
+    AuthService,
+    UserService,
+    PrismaService
+  ],
   imports: [
-
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '60s' },
