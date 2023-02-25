@@ -17,7 +17,7 @@ import { TrackService } from './track.service';
     ArtistService,
     AlbumService,
     AuthService,
-    JwtService
+    JwtService,
   ],
   exports: [TrackModule],
 })

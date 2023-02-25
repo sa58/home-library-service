@@ -17,7 +17,7 @@ import { AlbumService } from './album.service';
     FavsService,
     PrismaService,
     AuthService,
-    JwtService
+    JwtService,
   ],
   exports: [AlbumModule],
 })

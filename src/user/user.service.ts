@@ -47,21 +47,21 @@ export class UserService {
     createUserDto: CreateUserDto,
   ): Promise<Omit<UserEntity, 'password'>> {
     const saltRounds = 10;
-    const hashed = await hash(createUserDto.password, saltRounds)
+    const hashed = await hash(createUserDto.password, saltRounds);
     const now = BigInt(Date.now());
 
-      console.log(hashed)
+    console.log(hashed);
 
-      const newUser = {
-        ...createUserDto,
-        password: hashed,
-        id: v4(),
-        version: 1,
-        createdAt: now,
-        updatedAt: now,
-      };
+    const newUser = {
+      ...createUserDto,
+      password: hashed,
+      id: v4(),
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+    };
 
-      return await this.prisma.user.create({ data: newUser });
+    return await this.prisma.user.create({ data: newUser });
   }
 
   async delete(uuid: string): Promise<void> {

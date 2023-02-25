@@ -1,9 +1,9 @@
 export class TokenPairEntity {
-    accessToken: string;
+  accessToken: string;
 
-    refreshToken: string;
+  refreshToken: string;
 
-    constructor(partial: Partial<TokenPairEntity>) {
-        Object.assign(this, partial);
-    }
+  constructor(partial: Partial<TokenPairEntity>) {
+    Object.assign(this, partial);
+  }
 }

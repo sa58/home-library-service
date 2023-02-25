@@ -17,7 +17,7 @@ import { FavsService } from './favs.service';
     AlbumService,
     TrackService,
     AuthService,
-    JwtService
+    JwtService,
   ],
   exports: [FavsModule],
 })

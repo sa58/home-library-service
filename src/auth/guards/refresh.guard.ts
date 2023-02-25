@@ -1,12 +1,16 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class RefreshGuard implements CanActivate {
-  constructor(
-    private jwtService: JwtService
-  ) {}
+  constructor(private jwtService: JwtService) {}
 
   canActivate(
     context: ExecutionContext,
@@ -14,7 +18,7 @@ export class RefreshGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const { refreshToken } = request.body;
 
-    if(!refreshToken) {
+    if (!refreshToken) {
       throw new UnauthorizedException('UnauthorizedException');
     }
 
@@ -27,11 +31,13 @@ export class RefreshGuard implements CanActivate {
 
   async validateToken(token: string) {
     try {
-      await this.jwtService.verifyAsync(token, {secret: process.env.JWT_SECRET_REFRESH_KEY});
+      await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET_REFRESH_KEY,
+      });
 
       return true;
     } catch (err) {
-        throw new ForbiddenException(err.message);
+      throw new ForbiddenException(err.message);
     }
   }
 }

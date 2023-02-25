@@ -17,7 +17,7 @@ import { ArtistService } from './artist.service';
     PrismaService,
     FavsService,
     AuthService,
-    JwtService
+    JwtService,
   ],
   imports: [],
   exports: [ArtistModule],
