@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { JwtService } from '@nestjs/jwt'
-import { TokenPairEntity } from './tokenPair.entity';
+import { TokenPairEntity } from './token-pair.entity';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { compare } from 'bcrypt';
 
@@ -19,10 +19,10 @@ export class AuthService {
       }
     });
 
-    if (user) {
+    if (user.length) {
       const [userData] = user;
 
-      const isUserValid = compare(createUserDto.password, user[0].password);
+      const isUserValid = await compare(createUserDto.password, user[0].password);
 
       if (isUserValid) {
         const payload = { login: userData.login, userId: userData.id };
@@ -30,18 +30,18 @@ export class AuthService {
         const accessToken = this.jwtService.sign(payload);
         const refreshToken = this.jwtService.sign(payload, {
           secret: process.env.JWT_SECRET_REFRESH_KEY,
-          expiresIn: '120s'
+          expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME
         });
   
-        console.log(accessToken)
-        console.log(refreshToken)
-  
-        console.log(refreshToken === accessToken)
         return {
           accessToken,
           refreshToken
         }
+      } else {
+        throw new ForbiddenException('ForbiddenException');
       }
+    } else {
+      throw new ForbiddenException('ForbiddenException');
     }
   }
 }
