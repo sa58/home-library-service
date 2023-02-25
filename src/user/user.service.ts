@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { v4 } from 'uuid';
+import { hash } from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './user.entity';
@@ -41,6 +42,27 @@ export class UserService {
     };
 
     return await this.prisma.user.create({ data: newUser });
+  }
+
+  async signUpUser(
+    createUserDto: CreateUserDto,
+  ): Promise<Omit<UserEntity, 'password'>> {
+    const saltRounds = 10;
+    const hashed = await hash(createUserDto.password, saltRounds)
+    const now = BigInt(Date.now());
+
+      console.log(hashed)
+
+      const newUser = {
+        ...createUserDto,
+        password: hashed,
+        id: v4(),
+        version: 1,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      return await this.prisma.user.create({ data: newUser });
   }
 
   async delete(uuid: string): Promise<void> {
