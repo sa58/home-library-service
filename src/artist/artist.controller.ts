@@ -10,13 +10,16 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { parseUUIDPipeOptions } from 'src/app.constants';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { ArtistEntity } from './artist.entity';
 import { ArtistService } from './artist.service';
 import { ArtistDto } from './dto/artist.dto';
 
+@UseGuards(AuthGuard)
 @Controller('artist')
 @UseInterceptors(ClassSerializerInterceptor)
 export class ArtistController {

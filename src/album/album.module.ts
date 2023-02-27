@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ArtistService } from 'src/artist/artist.service';
+import { AuthService } from 'src/auth/auth.service';
 import { FavsService } from 'src/favs/favs.service';
 import { PrismaService } from 'src/prisma.service';
 import { TrackService } from 'src/track/track.service';
@@ -14,6 +16,8 @@ import { AlbumService } from './album.service';
     TrackService,
     FavsService,
     PrismaService,
+    AuthService,
+    JwtService,
   ],
   exports: [AlbumModule],
 })
